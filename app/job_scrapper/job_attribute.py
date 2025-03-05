@@ -1,0 +1,10 @@
+class JobAttr:
+    SEARCH_TITLE = 'Search Title'
+    JOB_ID = 'Job ID'
+    COMPANY = 'Company'
+    LOCATION = 'Location'
+    JOB_TITLE = 'Job Title'
+    JOB_TYPE = 'Job Type'
+    WORKSPACE = 'Workspace'
+    JOB_URL = 'Job URL'
+    JOB_DESC = 'Job Description'

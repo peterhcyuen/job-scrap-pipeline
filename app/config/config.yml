@@ -1,0 +1,67 @@
+llm:
+  provider: gemini
+  model: gemini-2.0-flash
+  api_key:
+selenium:
+  show_browser: True
+  user_data_dir:
+tasks:
+  -
+    skillset: skillset.txt
+    llm_filter: true
+    site_name: linkedin
+    excluded_companies:
+      - Lumenalta
+    queries:
+      -
+        job_title: Machine Learning Engineer
+        location: Vancouver
+        num_jobs: 1000
+        hours_within: 24
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words:
+          - machine learning
+          - ml
+          - artificial intelligence
+          - ai
+        exclude_words: []
+      - job_title: Data Scientist
+        location: Vancouver
+        num_jobs: 1000
+        hours_within: 24
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words:
+          - data scientist
+          - data science
+          - ds
+        exclude_words: []
+      - job_title: Data Engineer
+        location: Vancouver
+        num_jobs: 1000
+        hours_within: 24
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words:
+          - Data Engineer
+        exclude_words: []
+      -
+        job_title: Software Engineer
+        location: Vancouver
+        num_jobs: 1000
+        hours_within: 24
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words: []
+        exclude_words:
+          - fullstack
+          - full-stack
+          - full stack
+          - frontend
+          - front end
+          - front-end
