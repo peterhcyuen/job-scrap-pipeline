@@ -6,9 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 
-from job_scrapper.abstract_scrapper import AbstractScrapper
-from job_scrapper.job_attribute import JobAttr
-from job_scrapper.query import SearchQuery, ExpLevel, JobType, Workspace
+from .abstract_scrapper import AbstractScrapper
+from .job_attribute import JobAttr
+from .query import SearchQuery, ExpLevel, JobType, Workspace
 
 logger = logging.getLogger(__name__)
 

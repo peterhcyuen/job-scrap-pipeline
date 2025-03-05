@@ -12,8 +12,8 @@ from selenium.webdriver.chromium.webdriver import ChromiumDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 
-from job_scrapper.job_attribute import JobAttr
-from job_scrapper.query import SearchQuery
+from .job_attribute import JobAttr
+from .query import SearchQuery
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ class AbstractScrapper(abc.ABC):
         if self.scrapped_job_list:
             df_jobs = pd.DataFrame(self.scrapped_job_list)
             df_jobs = df_jobs.drop_duplicates(subset=[JobAttr.JOB_ID])
-            logger.info(f"Filter out duplicated jobs. Final scrapped jobs count: {len(self.scrapped_job_list)}")
+            logger.info(f"Filter out duplicated jobs. Final scrapped jobs count: {df_jobs.shape[0]}")
 
         self.driver.quit()
 
