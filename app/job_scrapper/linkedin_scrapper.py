@@ -156,6 +156,7 @@ class LinkedInScrapper(AbstractScrapper):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     scrapper = LinkedInScrapper(user_data_dir="C:\\Users\\hcyue\\AppData\\Local\\Google\\Chrome\\User Data", show_browser=True)
     queries = [
         SearchQuery(

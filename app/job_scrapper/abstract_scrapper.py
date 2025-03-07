@@ -77,16 +77,16 @@ class AbstractScrapper(abc.ABC):
                 break
 
     def _build_url(self) -> str:
-        NotImplementedError
+        raise NotImplementedError
 
     def _scrap_job(self, job_card: WebElement):
-        NotImplementedError
+        raise NotImplementedError
 
     def _scrap_page(self):
-        NotImplementedError
+        raise NotImplementedError
 
     def _search_query(self):
-        NotImplementedError
+        raise NotImplementedError
 
     def search(self, queries: List[SearchQuery]) -> pd.DataFrame:
         self.scrapped_job_list = []
