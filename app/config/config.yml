@@ -5,6 +5,7 @@ llm:
 selenium:
   show_browser: True
   user_data_dir:
+  profile: 'Profile 1'
 tasks:
   -
     skillset: skillset.txt

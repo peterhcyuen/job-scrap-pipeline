@@ -5,7 +5,7 @@ from typing import Optional, List, Tuple
 
 import pandas as pd
 from selenium import webdriver
-from selenium.common import TimeoutException, NoSuchElementException
+from selenium.common import TimeoutException, NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chromium.webdriver import ChromiumDriver
@@ -19,17 +19,18 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractScrapper(abc.ABC):
-    def __init__(self, user_data_dir: str = None, show_browser=False):
+    def __init__(self, user_data_dir: str = None, profile: str = None, show_browser=False):
         self.chrome_options = Options()
         self.chrome_options.add_argument("--disable-gpu")
         self.chrome_options.add_argument("--disable-notifications")
         self.chrome_options.add_argument("--no-sandbox")
         self.chrome_options.add_argument("--disable-dev-shm-usage")
+        self.chrome_options.add_argument("--disable-extensions")
         if not show_browser:
             self.chrome_options.add_argument("--headless")  # Run in headless mode (no browser UI)
         if user_data_dir:
             self.chrome_options.add_argument(f"user-data-dir={user_data_dir}")
-            self.chrome_options.add_argument("--profile-directory=Default")
+            self.chrome_options.add_argument(f"--profile-directory={profile}")
 
         self.driver: Optional[ChromiumDriver] = None
 
@@ -69,12 +70,15 @@ class AbstractScrapper(abc.ABC):
     def _page_scroll(self, web_element: WebElement):
         self.driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", web_element)
         time.sleep(1)
-        while True:
-            web_element.send_keys(Keys.PAGE_UP)
-            time.sleep(1)
-            scroll_top = self.driver.execute_script("return arguments[0].scrollTop", web_element)
-            if scroll_top <= 0:
-                break
+        try:
+            while True:
+                web_element.send_keys(Keys.PAGE_UP)
+                time.sleep(1)
+                scroll_top = self.driver.execute_script("return arguments[0].scrollTop", web_element)
+                if scroll_top <= 0:
+                    break
+        except ElementNotInteractableException as e:
+            logger.error(e)
 
     def _build_url(self) -> str:
         raise NotImplementedError

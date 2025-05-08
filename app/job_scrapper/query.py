@@ -31,6 +31,7 @@ class SearchQuery:
     location: str
     num_jobs: int
     fetch_description: bool
+    custom_url: Optional[str] = None
     job_type: Optional[JobType] = None
     experience_level: Optional[ExpLevel] = None
     workspace: Optional[Workspace] = None

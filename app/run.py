@@ -38,6 +38,7 @@ def setup_llm():
 
 def setup_scrapper():
     AppContext.linkedin_scrapper = LinkedInScrapper(user_data_dir=AppContext.config.selenium.user_data_dir,
+                                                    profile=AppContext.config.selenium.profile,
                                                     show_browser=AppContext.config.selenium.show_browser)
 
 
@@ -56,6 +57,7 @@ def create_task() -> List[Task]:
                     job_title=query.job_title,
                     location=query.location,
                     num_jobs=query.num_jobs,
+                    custom_url=query.custom_url,
                     fetch_description=query.fetch_description,
                     job_type=JobType(query.job_type),
                     experience_level=ExpLevel(query.experience_level),

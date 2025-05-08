@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class LinkedInScrapper(AbstractScrapper):
-    def __init__(self, user_data_dir: str = None, show_browser=False):
-        super().__init__(user_data_dir, show_browser)
+    def __init__(self, user_data_dir: str = None, profile: str = None, show_browser=False):
+        super().__init__(user_data_dir, profile, show_browser)
 
         # Dictionary to map user-friendly experience levels to LinkedIn's filter values
         self.experience_level_mapping = {
@@ -43,6 +43,9 @@ class LinkedInScrapper(AbstractScrapper):
         }
 
     def _build_url(self) -> str:
+        if self.curr_query.custom_url:
+            return self.curr_query.custom_url
+
         base_url = "https://www.linkedin.com/jobs/search/?keywords={}&location={}"
 
         job_title_formatted = self.curr_query.job_title.replace(" ", "%20")
