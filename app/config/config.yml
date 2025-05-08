@@ -3,9 +3,14 @@ llm:
   model: gemini-2.0-flash
   api_key:
 selenium:
-  show_browser: True
-  user_data_dir:
-  profile: 'Profile 1'
+  browser: firefox
+  firefox:
+    show_browser: True
+    profile_dir: 'C:\\Users\\hcyue\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ct2eqjbh.default-release'
+  chrome:
+    show_browser: True
+    user_data_dir: 'C:\\Users\\hcyue\\AppData\\Local\\Google\\Chrome\\User Data'
+    profile: 'Profile 1'
 tasks:
   -
     skillset: skillset.txt

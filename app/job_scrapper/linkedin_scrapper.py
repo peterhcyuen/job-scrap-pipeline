@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 
+from dotdict import DotDict
 from .abstract_scrapper import AbstractScrapper
 from .job_attribute import JobAttr
 from .query import SearchQuery, ExpLevel, JobType, Workspace
@@ -14,8 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class LinkedInScrapper(AbstractScrapper):
-    def __init__(self, user_data_dir: str = None, profile: str = None, show_browser=False):
-        super().__init__(user_data_dir, profile, show_browser)
+    def __init__(self, selenium_config: DotDict):
+        super().__init__(selenium_config)
 
         # Dictionary to map user-friendly experience levels to LinkedIn's filter values
         self.experience_level_mapping = {

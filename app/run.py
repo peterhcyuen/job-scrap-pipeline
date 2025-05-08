@@ -37,9 +37,7 @@ def setup_llm():
 
 
 def setup_scrapper():
-    AppContext.linkedin_scrapper = LinkedInScrapper(user_data_dir=AppContext.config.selenium.user_data_dir,
-                                                    profile=AppContext.config.selenium.profile,
-                                                    show_browser=AppContext.config.selenium.show_browser)
+    AppContext.linkedin_scrapper = LinkedInScrapper(selenium_config=AppContext.config.selenium)
 
 
 def create_task() -> List[Task]:

@@ -8,10 +8,12 @@ from selenium import webdriver
 from selenium.common import TimeoutException, NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chromium.webdriver import ChromiumDriver
+from selenium.webdriver.firefox.options import Options as FireFoxOptions
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 
+from dotdict import DotDict
 from .job_attribute import JobAttr
 from .query import SearchQuery
 
@@ -19,21 +21,33 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractScrapper(abc.ABC):
-    def __init__(self, user_data_dir: str = None, profile: str = None, show_browser=False):
-        self.chrome_options = Options()
-        self.chrome_options.add_argument("--disable-gpu")
-        self.chrome_options.add_argument("--disable-notifications")
-        self.chrome_options.add_argument("--no-sandbox")
-        self.chrome_options.add_argument("--disable-dev-shm-usage")
-        self.chrome_options.add_argument("--disable-extensions")
-        if not show_browser:
-            self.chrome_options.add_argument("--headless")  # Run in headless mode (no browser UI)
-        if user_data_dir:
-            self.chrome_options.add_argument(f"user-data-dir={user_data_dir}")
-            self.chrome_options.add_argument(f"--profile-directory={profile}")
+    def __init__(self, selenium_config: DotDict):
+        if selenium_config.browser == 'chrome':
+            browser_config = selenium_config.chrome
+            self.options = Options()
+            self.options.add_argument("--disable-gpu")
+            self.options.add_argument("--disable-notifications")
+            self.options.add_argument("--no-sandbox")
+            self.options.add_argument("--disable-dev-shm-usage")
+            self.options.add_argument("--disable-extensions")
+            if not browser_config.show_browser:
+                self.options.add_argument("--headless")  # Run in headless mode (no browser UI)
+            if browser_config.user_data_dir:
+                self.options.add_argument(f"--user-data-dir={browser_config.user_data_dir}")
+                self.options.add_argument(f"--profile-directory={browser_config.profile}")
+        elif selenium_config.browser == 'firefox':
+            browser_config = selenium_config.firefox
+            self.options = FireFoxOptions()
+            if not browser_config.show_browser:
+                self.options.headless = True
+            self.options.add_argument(f"-profile={browser_config.profile_dir}")
+            self.options.set_preference("layers.acceleration.disabled", True)
+            self.options.set_preference("dom.webnotifications.enabled", False)
+        else:
+            raise ValueError(f"Unsupported browser: {selenium_config.browser}")
 
-        self.driver: Optional[ChromiumDriver] = None
-
+        self.browser = selenium_config.browser
+        self.driver: Optional[WebDriver] = None
         self.curr_query: Optional[SearchQuery] = None
         self.scrapped_job_list = []
         self.job_counter = 0
@@ -94,7 +108,11 @@ class AbstractScrapper(abc.ABC):
 
     def search(self, queries: List[SearchQuery]) -> pd.DataFrame:
         self.scrapped_job_list = []
-        self.driver = webdriver.Chrome(options=self.chrome_options)
+
+        if self.browser == 'chrome':
+            self.driver = webdriver.Chrome(options=self.options)
+        elif self.browser == 'firefox':
+            self.driver = webdriver.Firefox(options=self.options)
 
         for query in queries:
             logger.info(f"Starting searching {query.job_title}")
