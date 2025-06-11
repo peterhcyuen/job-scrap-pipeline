@@ -139,18 +139,13 @@ class LinkedInScrapper(AbstractScrapper):
         search_url = self._build_url()
         logger.info(f"Search URL: {search_url}")
         self._load_page(search_url)
+        time.sleep(5)
 
         while not self.curr_query_finished:
             self._scrap_page()
-            pagination = self._find_element_by([(By.CSS_SELECTOR, "ul.artdeco-pagination__pages")])
-            if pagination is None:
-                break
-            active_page = pagination.find_element(By.CSS_SELECTOR, "li.active")
-            page_list = pagination.find_elements(By.CSS_SELECTOR, "li")
-            cur_idx = page_list.index(active_page)
-            if cur_idx < len(page_list) - 1:
-                next_page = page_list[cur_idx + 1]
-                next_page.click()
+            next_button = self._find_element_by([(By.CSS_SELECTOR, "button.jobs-search-pagination__button--next")])
+            if next_button is not None:
+                next_button.click()
                 WebDriverWait(self.driver, 10).until(
                     lambda web_driver: web_driver.execute_script('return document.readyState') == 'complete'
                 )

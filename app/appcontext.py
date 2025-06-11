@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from app.dotdict import DotDict
+from dotdict import DotDict
 from job_scrapper.linkedin_scrapper import LinkedInScrapper
 
 
