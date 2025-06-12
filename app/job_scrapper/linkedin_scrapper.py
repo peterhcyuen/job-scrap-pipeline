@@ -1,15 +1,12 @@
 import logging
 import time
 
-from selenium.common import NoSuchElementException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.wait import WebDriverWait
+from DrissionPage._elements.none_element import NoneElement
 
 from dotdict import DotDict
 from .abstract_scrapper import AbstractScrapper
 from .job_attribute import JobAttr
-from .query import SearchQuery, ExpLevel, JobType, Workspace
+from .query import ExpLevel, JobType, Workspace
 
 logger = logging.getLogger(__name__)
 
@@ -70,19 +67,13 @@ class LinkedInScrapper(AbstractScrapper):
 
         return url
 
-    def _scrap_job(self, job_card: WebElement):
-        job_id = job_card.get_attribute("data-occludable-job-id")
+    def _scrap_job(self, job_id: str):
         company_name = None
-        if (company_name_dom := self._find_element_by([(By.CSS_SELECTOR, "div.job-details-jobs-unified-top-card__company-name > a"),
-                                                       (By.CSS_SELECTOR, "div.job-details-jobs-unified-top-card__company-name")])) is not None:
+        if (company_name_dom := self.driver.find(["css:div.job-details-jobs-unified-top-card__company-name > a", "css:div.job-details-jobs-unified-top-card__company-name"])[1]) is not None:
             company_name = company_name_dom.text.strip()
-        location = self.driver.find_elements(By.CSS_SELECTOR, "div.job-details-jobs-unified-top-card__primary-description-container > div > span")[0].text
-        job_title = self.driver.find_element(By.CSS_SELECTOR, "div.job-details-jobs-unified-top-card__job-title > h1 > a").text.strip()
-        # workspace = self.driver.find_element(By.CSS_SELECTOR,
-        #                                      "div.relative.job-details-jobs-unified-top-card__container--two-pane > div > button > div:nth-child(2) > span > span:nth-child(1)").text.strip()
-        # job_type = self.driver.find_element(By.CSS_SELECTOR,
-        #                                     "div.relative.job-details-jobs-unified-top-card__container--two-pane > div > button > div:nth-child(3) > span > span:nth-child(1)").text.strip()
-        job_description = self.driver.find_element(By.ID, "job-details").text
+        location = self.driver.eles("css:div.job-details-jobs-unified-top-card__primary-description-container > div > span")[0].text
+        job_title = self.driver.ele("css:div.job-details-jobs-unified-top-card__job-title > h1 > a").text.strip()
+        job_description = self.driver.ele("@id:job-details").text
 
         logger.info(f"Company: {company_name}, Job Title: {job_title}")
 
@@ -113,20 +104,15 @@ class LinkedInScrapper(AbstractScrapper):
 
     def _scrap_page(self):
         logger.info(f"Searching page {self.page_counter + 1}")
-        scroll_list = self.driver.find_element(By.CSS_SELECTOR, "div.scaffold-layout__list > div")
+        scroll_list = self.driver.ele('css:div.scaffold-layout__list > div')
         self._page_scroll(scroll_list)
-        job_ul = self.driver.find_element(By.CSS_SELECTOR, "#main > div > div.scaffold-layout__list-detail-inner.scaffold-layout__list-detail-inner--grow > div.scaffold-layout__list > div > ul")
-        job_cards = job_ul.find_elements(By.CSS_SELECTOR, 'li.scaffold-layout__list-item')
+        job_ul = self.driver.ele("css:#main > div > div.scaffold-layout__list-detail-inner.scaffold-layout__list-detail-inner--grow > div.scaffold-layout__list > div > ul")
+        job_cards = job_ul.eles('css:li.scaffold-layout__list-item')
         for job_card in job_cards:
-            try:
-                job_card.find_element(By.TAG_NAME, "a").click()
-                WebDriverWait(self.driver, 5).until(
-                    lambda web_driver: web_driver.execute_script('return document.readyState') == 'complete'
-                )
-                time.sleep(1)
-                self._scrap_job(job_card)
-            except NoSuchElementException as e:
-                logger.error(e)
+            job_card.ele("tag:a").click()
+            self.driver._wait_loaded(5)
+            time.sleep(1)
+            self._scrap_job(job_card.attr("data-occludable-job-id"))
 
             if self.job_counter >= self.curr_query.num_jobs:
                 logger.info(f"Stop searching as current job count already reach {self.curr_query.num_jobs}")
@@ -143,43 +129,10 @@ class LinkedInScrapper(AbstractScrapper):
 
         while not self.curr_query_finished:
             self._scrap_page()
-            next_button = self._find_element_by([(By.CSS_SELECTOR, "button.jobs-search-pagination__button--next")])
-            if next_button is not None:
+            next_button = self.driver.ele('css:button.jobs-search-pagination__button--next')
+            if next_button is not None and not isinstance(next_button, NoneElement):
                 next_button.click()
-                WebDriverWait(self.driver, 10).until(
-                    lambda web_driver: web_driver.execute_script('return document.readyState') == 'complete'
-                )
+                self.driver._wait_loaded(5)
                 time.sleep(2)
             else:
                 break
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    scrapper = LinkedInScrapper(user_data_dir="C:\\Users\\hcyue\\AppData\\Local\\Google\\Chrome\\User Data", show_browser=True)
-    queries = [
-        SearchQuery(
-            job_title="Software Engineer",
-            location="Vancouver",
-            num_jobs=10,
-            fetch_description=False,
-            experience_level=ExpLevel.MID_SENIOR,
-            job_type=JobType.FULL_TIME,
-            hours_within=24,
-            exclude_words=['fullstack', 'full-stack', 'full stack', 'frontend', 'front end', 'front-end'],
-            exclude_companies=['Lumenalta']
-        ),
-        SearchQuery(
-            job_title="Machine Learning Engineer",
-            location="Vancouver",
-            num_jobs=10,
-            fetch_description=False,
-            experience_level=ExpLevel.MID_SENIOR,
-            hours_within=24,
-            include_words=['Machine Learning', 'ML', 'artificial intelligence', 'ai'],
-            exclude_companies=['Lumenalta']
-        )
-    ]
-    jobs = scrapper.search(queries)
-    if jobs is not None:
-        jobs.to_csv("scrapped_jobs.csv", index=False)

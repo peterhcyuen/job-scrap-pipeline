@@ -51,6 +51,13 @@ def execute_task(task: Task) -> pd.DataFrame:
             logger.info("Filter out jobs that already being searched previously")
             df_jobs = df_jobs[~df_jobs[JobAttr.JOB_ID].isin(AppContext.linkedin_searched_ids)]
 
+    if task.site_name == 'indeed':
+        df_jobs = AppContext.indeed_scrapper.search(task.search_queries)
+        df_jobs['site'] = task.site_name
+        if AppContext.indeed_searched_ids:
+            logger.info("Filter out jobs that already being searched previously")
+            df_jobs = df_jobs[~df_jobs[JobAttr.JOB_ID].isin(AppContext.indeed_searched_ids)]
+
     logging.info(f"Searched job count: {df_jobs.shape[0]}")
 
     if df_jobs.empty:

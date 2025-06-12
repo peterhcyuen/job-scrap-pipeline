@@ -2,8 +2,9 @@ llm:
   provider: gemini
   model: gemini-2.0-flash
   api_key:
+indeed_url: https:/ca.indeed.com
 selenium:
-  browser: firefox
+  browser: chrome
   firefox:
     show_browser: True
     profile_dir: 'C:\\Users\\hcyue\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ct2eqjbh.default-release'
@@ -15,13 +16,14 @@ selenium:
 tasks:
   -
     skillset: skillset.txt
+  - skillset: skillset.txt
     llm_filter: true
     site_name: linkedin
     excluded_companies:
       - Lumenalta
+      - Amazon
     queries:
-      -
-        job_title: Machine Learning Engineer
+      - job_title: Machine Learning Engineer
         location: Vancouver
         num_jobs: 1000
         hours_within: 24
@@ -46,21 +48,11 @@ tasks:
           - data science
           - ds
         exclude_words: []
-      - job_title: Data Engineer
+      - job_title: Software Engineer
         location: Vancouver
         num_jobs: 1000
         hours_within: 24
-        job_type: full-time
-        experience_level: mid-senior
-        fetch_description: true
-        include_words:
-          - Data Engineer
-        exclude_words: []
-      -
-        job_title: Software Engineer
-        location: Vancouver
-        num_jobs: 1000
-        hours_within: 24
+        custom_url: https://www.linkedin.com/jobs/search/?f_E=2%2C3%2C4&f_JT=F&f_T=9%2C39%2C25194%2C1586%2C24%2C557%2C6386%2C25206&f_TPR=r86400&geoId=103366113&keywords=software%20engineer&origin=JOB_SEARCH_PAGE_JOB_FILTER&sortBy=DD
         job_type: full-time
         experience_level: mid-senior
         fetch_description: true
@@ -72,3 +64,20 @@ tasks:
           - frontend
           - front end
           - front-end
+  - skillset: skillset.txt
+    llm_filter: true
+    site_name: indeed
+    excluded_companies:
+      - Lumenalta
+      - Amazon
+    queries:
+      - job_title: Software Engineer
+        location: Vancouver
+        num_jobs: 10
+        hours_within: 24
+        custom_url: null
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words: [ ]
+        exclude_words: [ ]

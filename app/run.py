@@ -12,6 +12,7 @@ from langchain_ollama import ChatOllama
 
 from appcontext import AppContext
 from dotdict import DotDict
+from job_scrapper.indeed_scrapper import IndeedScraper
 from job_scrapper.job_attribute import JobAttr
 from job_scrapper.linkedin_scrapper import LinkedInScrapper
 from job_scrapper.query import SearchQuery, JobType, ExpLevel
@@ -38,6 +39,7 @@ def setup_llm():
 
 def setup_scrapper():
     AppContext.linkedin_scrapper = LinkedInScrapper(selenium_config=AppContext.config.selenium)
+    AppContext.indeed_scrapper = IndeedScraper(selenium_config=AppContext.config.selenium, indeed_url=AppContext.config.indeed_url)
 
 
 def create_task() -> List[Task]:
@@ -79,10 +81,18 @@ def create_task() -> List[Task]:
 
 
 def post_scrapped_jobs(jobs: pd.DataFrame):
-    all_jobs_id = jobs[JobAttr.JOB_ID].tolist()
-    with open(os.path.join("historical_job_ids", "linkedin_job_ids.txt"), 'a', encoding='utf-8') as f:
-        for job_id in all_jobs_id:
-            f.write(job_id + '\n')
+    sites = jobs['site'].unique().tolist()
+    for site in sites:
+        all_jobs_id = jobs[jobs['site'] == site][JobAttr.JOB_ID].tolist()
+        job_ids_file = None
+        if site == 'linkedin':
+            job_ids_file = 'linkedin_job_ids.txt'
+        elif site == 'indeed':
+            job_ids_file = 'indeed_job_ids.txt'
+
+        with open(os.path.join("historical_job_ids", job_ids_file), 'a', encoding='utf-8') as f:
+            for job_id in all_jobs_id:
+                f.write(job_id + '\n')
 
     jobs = jobs[
         [JobAttr.SEARCH_TITLE,
@@ -115,6 +125,16 @@ if __name__ == '__main__':
     else:
         with open(linkedin_id_path, 'r', encoding='utf-8') as file:
             AppContext.linkedin_searched_ids = [line.strip() for line in file]
+
+    indeed_id_path = os.path.join("historical_job_ids", "indeed_job_ids.txt")
+    if not os.path.exists(indeed_id_path):
+        os.makedirs(os.path.dirname(indeed_id_path), exist_ok=True)
+        with open(indeed_id_path, 'w', encoding='utf-8') as f:
+            pass
+        AppContext.indeed_searched_ids = []
+    else:
+        with open(linkedin_id_path, 'r', encoding='utf-8') as file:
+            AppContext.indeed_searched_ids = [line.strip() for line in file]
 
     setup_llm()
     setup_scrapper()
