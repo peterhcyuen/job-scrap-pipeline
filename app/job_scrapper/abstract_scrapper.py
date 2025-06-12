@@ -35,14 +35,18 @@ class AbstractScrapper(abc.ABC):
             if browser_config.user_data_dir:
                 self.options.add_argument(f"--user-data-dir={browser_config.user_data_dir}")
                 self.options.add_argument(f"--profile-directory={browser_config.profile}")
+            if 'binary_path' in browser_config:
+                self.options.binary_location = browser_config.binary_path
         elif selenium_config.browser == 'firefox':
             browser_config = selenium_config.firefox
             self.options = FireFoxOptions()
             if not browser_config.show_browser:
                 self.options.headless = True
-            self.options.add_argument(f"-profile={browser_config.profile_dir}")
+            self.options.profile = browser_config.profile_dir
             self.options.set_preference("layers.acceleration.disabled", True)
             self.options.set_preference("dom.webnotifications.enabled", False)
+            self.options.set_preference("dom.webdriver.enabled", False)
+            self.options.set_preference('useAutomationExtension', False)
         else:
             raise ValueError(f"Unsupported browser: {selenium_config.browser}")
 
