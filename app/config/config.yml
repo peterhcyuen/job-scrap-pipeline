@@ -2,7 +2,7 @@ llm:
   provider: gemini
   model: gemini-2.0-flash
   api_key:
-indeed_url: https:/ca.indeed.com
+indeed_url: https://ca.indeed.com
 selenium:
   browser: chrome
   firefox:
@@ -14,8 +14,6 @@ selenium:
     user_data_dir: 'C:\\Users\\hcyue\\AppData\\Local\\Chromium\\User Data'
     profile: 'Default'
 tasks:
-  -
-    skillset: skillset.txt
   - skillset: skillset.txt
     llm_filter: true
     site_name: linkedin
