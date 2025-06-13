@@ -49,7 +49,6 @@ class AbstractScrapper(abc.ABC):
     def reset(self):
         self.job_counter = 0
         self.page_counter = 0
-        self.scrapped_job_list = []
         self.curr_query_finished = False
 
     def _load_page(self, url):
