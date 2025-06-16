@@ -104,7 +104,7 @@ def post_scrapped_jobs(jobs: pd.DataFrame):
          'llm_comment',
          'validate_result']
     ]
-    jobs = jobs.sort_values(by=['site', JobAttr.SEARCH_TITLE, 'llm_comment'])
+    jobs = jobs.sort_values(by=['site', JobAttr.SEARCH_TITLE, JobAttr.COMPANY])
     jobs.to_csv(os.path.join('scrapped_jobs', f"{datetime.now().strftime('%Y-%m-%d_%H-%M')}.csv"), index=False)
 
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
             pass
         AppContext.indeed_searched_ids = []
     else:
-        with open(linkedin_id_path, 'r', encoding='utf-8') as file:
+        with open(indeed_id_path, 'r', encoding='utf-8') as file:
             AppContext.indeed_searched_ids = [line.strip() for line in file]
 
     setup_llm()
