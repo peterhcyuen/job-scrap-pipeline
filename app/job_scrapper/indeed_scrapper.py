@@ -35,7 +35,7 @@ class IndeedScraper(AbstractScrapper):
     def _scrap_job(self, job_id: str):
         job_url = f'{self.indeed_url}/viewjob?jk={job_id}'
         self._load_page(job_url)
-        company_name = self.driver.find(['css:div[data-company-name="true"] a', 'css:div[data-company-name="true"] span'])[1].text
+        company_name = self.driver.find(['css:div[data-company-name="true"] a', 'css:div[data-company-name="true"] span'], timeout=2)[1].text
         job_title = self.driver.ele('css:.jobsearch-JobInfoHeader-title > span').text
         location = self.driver.ele('css:div[data-testid="inlineHeader-companyLocation"]').text
         job_description = self.driver.ele('@id:jobDescriptionText').text

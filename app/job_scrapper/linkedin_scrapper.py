@@ -69,7 +69,7 @@ class LinkedInScrapper(AbstractScrapper):
 
     def _scrap_job(self, job_id: str):
         company_name = None
-        if (company_name_dom := self.driver.find(["css:div.job-details-jobs-unified-top-card__company-name > a", "css:div.job-details-jobs-unified-top-card__company-name"])[1]) is not None:
+        if (company_name_dom := self.driver.find(["css:div.job-details-jobs-unified-top-card__company-name > a", "css:div.job-details-jobs-unified-top-card__company-name"], timeout=2)[1]) is not None:
             company_name = company_name_dom.text.strip()
         location = self.driver.eles("css:div.job-details-jobs-unified-top-card__primary-description-container > div > span")[0].text
         job_title = self.driver.ele("css:div.job-details-jobs-unified-top-card__job-title > h1 > a").text.strip()

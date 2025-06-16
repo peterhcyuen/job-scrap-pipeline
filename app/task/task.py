@@ -78,13 +78,13 @@ def execute_task(task: Task) -> pd.DataFrame:
                 logger.error(e)
                 continue
 
-            if result.lower() == 'good fit':
+            if result.lower() == 'good':
                 good_ids.append(job_id)
                 llm_response_normal_ids.append(job_id)
-            elif result.lower() == 'moderate fit':
+            elif result.lower() == 'moderate':
                 moderate_ids.append(job_id)
                 llm_response_normal_ids.append(job_id)
-            elif result.lower() == 'poor fit':
+            elif result.lower() == 'poor':
                 poor_ids.append(job_id)
                 llm_response_normal_ids.append(job_id)
             else:
