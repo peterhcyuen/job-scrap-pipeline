@@ -15,6 +15,7 @@ selenium:
     profile: 'Default'
 tasks:
   - skillset: skillset.txt
+    work_exp: work_experiences.txt
     llm_filter: true
     site_name: linkedin
     excluded_companies:
@@ -63,6 +64,7 @@ tasks:
           - front end
           - front-end
   - skillset: skillset.txt
+    work_exp: work_experiences.txt
     llm_filter: true
     site_name: indeed
     excluded_companies:

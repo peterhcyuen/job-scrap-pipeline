@@ -18,12 +18,13 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Task:
     skillset: str
+    work_exp: str
     llm_filter: bool
     site_name: str
     search_queries: List[SearchQuery]
 
 
-def ask_llm(skillset: str, job_description: str) -> str:
+def ask_llm(work_exp: str, skillset: str, job_description: str) -> str:
     llm = AppContext.llm
     chat_prompt = ChatPromptTemplate.from_messages([
         ("system", SYS_PROMPT),
@@ -32,6 +33,7 @@ def ask_llm(skillset: str, job_description: str) -> str:
 
     formatted_prompt = chat_prompt.invoke(
         {
+            'work_exp': work_exp,
             'skill': skillset,
             'job_ad': job_description
         }
@@ -73,7 +75,7 @@ def execute_task(task: Task) -> pd.DataFrame:
             job_id = row[JobAttr.JOB_ID]
             job_description = row[JobAttr.JOB_DESC]
             try:
-                result = ask_llm(task.skillset, job_description)
+                result = ask_llm(task.work_exp, task.skillset, job_description)
             except Exception as e:
                 logger.error(e)
                 continue

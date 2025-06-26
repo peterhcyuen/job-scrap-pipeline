@@ -49,6 +49,8 @@ def create_task() -> List[Task]:
         task = DotDict(task)
         with open(os.path.join('skillset', task.skillset), 'r', encoding='utf-8') as file:
             skillset_str = file.read()
+        with open(os.path.join('skillset', task.work_exp), 'r', encoding='utf-8') as file:
+            work_exp_str = file.read()
         query_list = []
         for query in task.queries:
             query = DotDict(query)
@@ -70,6 +72,7 @@ def create_task() -> List[Task]:
         task_list.append(
             Task(
                 skillset=skillset_str,
+                work_exp=work_exp_str,
                 llm_filter=task.llm_filter,
                 site_name=task.site_name,
                 search_queries=query_list
