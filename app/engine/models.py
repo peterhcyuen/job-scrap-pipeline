@@ -2,13 +2,11 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, List
 
-
 class JobType(Enum):
     FULL_TIME = 'full-time'
     PART_TIME = 'part-time'
     CONTRACT = 'contract'
     OTHER = 'other'
-
 
 class ExpLevel(Enum):
     INTERNSHIP = 'internship'
@@ -18,12 +16,10 @@ class ExpLevel(Enum):
     DIRECTOR = 'director'
     EXECUTIVE = 'executive'
 
-
 class Workspace(Enum):
     ONSITE = 'on-site'
     REMOTE = 'remote'
     HYBRID = 'hybrid'
-
 
 @dataclass
 class SearchQuery:
@@ -39,3 +35,11 @@ class SearchQuery:
     include_words: Optional[List[str]] = None
     exclude_words: Optional[List[str]] = None
     exclude_companies: Optional[List[str]] = None
+
+@dataclass
+class Task:
+    skillset: str
+    work_exp: str
+    llm_filter: bool
+    site_name: str
+    search_queries: List[SearchQuery]

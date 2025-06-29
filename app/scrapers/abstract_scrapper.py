@@ -8,10 +8,10 @@ from DrissionPage._configs.chromium_options import ChromiumOptions
 from DrissionPage._elements.chromium_element import ChromiumElement
 from DrissionPage._pages.chromium_page import ChromiumPage
 
-from dotdict import DotDict
+from common.dotdict import DotDict
 from .cloudflare_bypasser import CloudflareBypasser
 from .job_attribute import JobAttr
-from .query import SearchQuery
+from engine.models import SearchQuery
 
 logger = logging.getLogger(__name__)
 

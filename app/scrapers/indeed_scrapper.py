@@ -4,7 +4,7 @@ import time
 
 from DrissionPage._elements.none_element import NoneElement
 
-from dotdict import DotDict
+from common.dotdict import DotDict
 from .abstract_scrapper import AbstractScrapper
 from .job_attribute import JobAttr
 
