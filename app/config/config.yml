@@ -26,6 +26,7 @@ tasks:
         location: Vancouver
         num_jobs: 1000
         hours_within: 24
+        custom_url: https://www.linkedin.com/jobs/search/?f_E=2%2C3%2C4&f_JT=F&f_T=25206%2C30128%2C25169%2C31069&f_TPR=r86400&geoId=103366113&keywords=machine%20learning&origin=JOB_SEARCH_PAGE_JOB_FILTER&sortBy=DD
         job_type: full-time
         experience_level: mid-senior
         fetch_description: true
@@ -39,6 +40,7 @@ tasks:
         location: Vancouver
         num_jobs: 1000
         hours_within: 24
+        custom_url: https://www.linkedin.com/jobs/search/?f_E=2%2C3%2C4&f_JT=F&f_T=340%2C26144%2C25887%2C25190&f_TPR=r86400&geoId=103366113&keywords=data%20scientist&origin=JOB_SEARCH_PAGE_JOB_FILTER&sortBy=R
         job_type: full-time
         experience_level: mid-senior
         fetch_description: true
@@ -71,13 +73,46 @@ tasks:
       - Lumenalta
       - Amazon
     queries:
+      - job_title: Machine Learning Engineer
+        location: Vancouver, BC
+        num_jobs: 1000
+        hours_within: 24
+        custom_url: null
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words:
+          - machine learning
+          - ml
+          - artificial intelligence
+          - ai
+        exclude_words: [ ]
+      - job_title: Data Scientist
+        location: Vancouver, BC
+        num_jobs: 1000
+        hours_within: 24
+        custom_url: null
+        job_type: full-time
+        experience_level: mid-senior
+        fetch_description: true
+        include_words:
+          - data scientist
+          - data science
+          - ds
+        exclude_words: [ ]
       - job_title: Software Engineer
-        location: Vancouver
-        num_jobs: 10
+        location: Vancouver, BC
+        num_jobs: 1000
         hours_within: 24
         custom_url: null
         job_type: full-time
         experience_level: mid-senior
         fetch_description: true
         include_words: [ ]
-        exclude_words: [ ]
+        exclude_words:
+          - fullstack
+          - full-stack
+          - full stack
+          - frontend
+          - front end
+          - front-end
