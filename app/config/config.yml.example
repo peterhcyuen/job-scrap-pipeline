@@ -1,0 +1,50 @@
+llm:
+  provider: gemini
+  model: gemini-2.5-flash-lite
+  api_key:
+indeed_url: https://ca.indeed.com
+jobsdb_url: https://hk.jobsdb.com
+selenium:
+  browser: chrome
+  firefox:
+    show_browser: True
+    profile_dir: 'C:\\Users\\<USER>\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ct2eqjbh.default-release'
+  chrome:
+    show_browser: True
+    binary_path: 'C:\\Users\\<USER>\\Desktop\\chrome-win\\chrome.exe'
+    user_data_dir: 'C:\\Users\\<USER>\\AppData\\Local\\Chromium\\User Data'
+    profile: 'Default'
+tasks:
+    - skillset: skillset.txt
+      work_exp: work_experiences.txt
+      llm_filter: true
+      site_name: linkedin
+      excluded_companies: []
+      queries:
+        - job_title: Data Scientist
+          location: Vancouver
+          num_jobs: 1000
+          hours_within: 24
+          job_type: full-time
+          experience_level: mid-senior
+          fetch_description: true
+          include_words:
+            - data scientist
+            - data science
+            - ds
+          exclude_words: []
+        - job_title: Software Engineer
+          location: Vancouver
+          num_jobs: 1000
+          hours_within: 24
+          job_type: full-time
+          experience_level: mid-senior
+          fetch_description: true
+          include_words: []
+          exclude_words:
+            - fullstack
+            - full-stack
+            - full stack
+            - frontend
+            - front end
+            - front-end
