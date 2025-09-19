@@ -32,6 +32,7 @@ class SearchQuery:
     experience_level: Optional[ExpLevel] = None
     workspace: Optional[Workspace] = None
     hours_within: Optional[int] = None
+    salary_lower_bound: Optional[int] = None
     include_words: Optional[List[str]] = None
     exclude_words: Optional[List[str]] = None
     exclude_companies: Optional[List[str]] = None

@@ -1,0 +1,118 @@
+import logging
+import re
+import time
+
+from DrissionPage._elements.none_element import NoneElement
+from pydantic.v1.schema import encode_default
+
+from common.dotdict import DotDict
+from engine.models import JobType
+from .abstract_scrapper import AbstractScrapper
+from .job_attribute import JobAttr
+
+logger = logging.getLogger(__name__)
+
+
+class JobsDbScrapper(AbstractScrapper):
+    def __init__(self, selenium_config: DotDict, jobsdb_url: str):
+        super().__init__(selenium_config)
+        self.jobsdb_url = jobsdb_url
+        self.job_id_list = []
+
+    def reset(self):
+        super().reset()
+        self.job_id_list = []
+
+    def _build_url(self) -> str:
+        if self.curr_query.custom_url:
+            return self.curr_query.custom_url
+
+        url = self.jobsdb_url + f'/{self.curr_query.job_title.lower().replace(" ", "-")}-jobs/'
+        url += f"full-time"
+
+        param_list = []
+
+        if self.curr_query.hours_within is not None:
+            param_list.append(f"daterange={self.curr_query.hours_within // 24}")
+
+        if self.curr_query.salary_lower_bound is not None:
+            param_list.append(f"?salaryrange={self.curr_query.salary_lower_bound}-")
+
+        if param_list:
+            url = url + '?' + '&'.join(param_list)
+
+        return url
+
+    def _scrap_job(self, job_id: str):
+        job_url = f'{self.jobsdb_url}/job/{job_id}'
+        self._load_page(job_url)
+
+        company_name = self.driver.ele('css:span[data-automation="advertiser-name"]').text.strip()
+        location = self.driver.ele('css:span[data-automation="job-detail-location"]').text.strip()
+        job_title = self.driver.ele('css:h1[data-automation="job-detail-title"]').text.strip()
+        job_description = self.driver.ele('css:div[data-automation="jobAdDetails"]').text.strip()
+
+        logger.info(f"Company: {company_name}, Job Title: {job_title}")
+
+        if self.curr_query.exclude_companies and company_name in self.curr_query.exclude_companies:
+            logger.info(f"Skip this job as {company_name} in the list of excluded companies")
+            return
+
+        if self.curr_query.include_words and not any(kw.lower() in job_title.lower() for kw in self.curr_query.include_words):
+            logger.info(f"Skip this job as {job_title} does not include the required key words in {self.curr_query.include_words}")
+            return
+
+        if self.curr_query.exclude_words and any(kw.lower() in job_title.lower() for kw in self.curr_query.exclude_words):
+            logger.info(f"Skip this job as {job_title} include keywords in the exclusive word list {self.curr_query.exclude_words}")
+            return
+
+        self.job_counter += 1
+        self.scrapped_job_list.append({
+            JobAttr.JOB_ID: job_id,
+            JobAttr.SEARCH_TITLE: self.curr_query.job_title,
+            JobAttr.COMPANY: company_name,
+            JobAttr.JOB_TITLE: job_title,
+            JobAttr.LOCATION: location,
+            JobAttr.JOB_URL: f"{self.jobsdb_url}/job/{job_id}",
+            JobAttr.JOB_DESC: job_description if self.curr_query.fetch_description else ""
+        })
+
+    def _collect_job_ids(self):
+        logger.info("Start collecting job ids")
+        while True:
+            for job_link in self.driver.eles("css:div > a[data-automation='job-list-item-link-overlay']"):
+                job_url = job_link.attr('href')
+                m = re.search(r"/job/(\d+)", job_url)
+                job_id = m.group(1) if m else None
+                if job_id:
+                    self.job_id_list.append(job_id)
+
+            if len(self.job_id_list) >= self.curr_query.num_jobs:
+                break
+
+            next_page = self.driver.ele("css:a[title='Next'][aria-hidden='false']", timeout=2)
+            if next_page is None or isinstance(next_page, NoneElement):
+                break
+
+            self._click_page(next_page)
+            self.driver._wait_loaded(1)
+
+        logger.info("End collecting job ids")
+
+    def _search_query(self):
+        search_url = self._build_url()
+        logger.info(f"Search URL: {search_url}")
+        self._load_page(search_url)
+        self._collect_job_ids()
+        for job_id in self.job_id_list:
+            try:
+                self._scrap_job(job_id)
+            except Exception as e:
+                logger.error(e)
+                continue
+
+            time.sleep(1)
+            if self.job_counter >= self.curr_query.num_jobs:
+                logger.info(f"Stop searching as current job count already reach {self.curr_query.num_jobs}")
+                self.curr_query_finished = True
+                break

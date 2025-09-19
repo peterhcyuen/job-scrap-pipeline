@@ -3,6 +3,7 @@ llm:
   model: gemini-2.0-flash
   api_key:
 indeed_url: https://ca.indeed.com
+jobsdb_url: https://hk.jobsdb.com
 selenium:
   browser: chrome
   firefox:

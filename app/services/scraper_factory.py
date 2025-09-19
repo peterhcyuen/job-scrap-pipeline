@@ -1,4 +1,5 @@
 from scrapers.indeed_scrapper import IndeedScraper
+from scrapers.jobsdb_scrapper import JobsDbScrapper
 from scrapers.linkedin_scrapper import LinkedInScrapper
 
 class ScraperFactory:
@@ -10,5 +11,7 @@ class ScraperFactory:
             return LinkedInScrapper(selenium_config=self.config.selenium)
         elif site_name == 'indeed':
             return IndeedScraper(selenium_config=self.config.selenium, indeed_url=self.config.indeed_url)
+        elif site_name == 'jobsdb':
+            return JobsDbScrapper(selenium_config=self.config.selenium, jobsdb_url=self.config.jobsdb_url)
         else:
             raise ValueError(f"Unsupported site: {site_name}")

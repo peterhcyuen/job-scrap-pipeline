@@ -12,6 +12,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
+
 class Orchestrator:
     def __init__(self, config_service: ConfigService, history_service: JobHistoryService, scraper_factory: ScraperFactory, task_executor: TaskExecutor):
         self.config_service = config_service
@@ -42,6 +43,7 @@ class Orchestrator:
                         job_type=JobType(query.job_type),
                         experience_level=ExpLevel(query.experience_level),
                         hours_within=query.hours_within,
+                        salary_lower_bound=query.salary_lower_bound,
                         include_words=query.include_words,
                         exclude_words=query.exclude_words,
                         exclude_companies=task.excluded_companies
@@ -70,6 +72,8 @@ class Orchestrator:
                 history = self.history_service.get_linkedin_history()
             elif task.site_name == 'indeed':
                 history = self.history_service.get_indeed_history()
+            elif task.site_name == 'jobsdb':
+                history = self.history_service.get_jobsdb_history()
 
             df = self.task_executor.execute(task, scraper, history)
             if not df.empty:
@@ -78,19 +82,22 @@ class Orchestrator:
                     self.history_service.save_linkedin_history(df['Job ID'].tolist())
                 elif task.site_name == 'indeed':
                     self.history_service.save_indeed_history(df['Job ID'].tolist())
+                elif task.site_name == 'jobsdb':
+                    self.history_service.save_jobsdb_history(df['Job ID'].tolist())
 
         if list_dfs:
             df_jobs = pd.concat(list_dfs, ignore_index=True)
             df_jobs = df_jobs.drop_duplicates(subset=['Job ID'])
-            df_jobs = df_jobs[
-                [JobAttr.SEARCH_TITLE,
+            columns = [
+                JobAttr.SEARCH_TITLE,
                 'site',
                 JobAttr.JOB_TITLE,
                 JobAttr.COMPANY,
                 JobAttr.JOB_URL,
                 JobAttr.LOCATION,
-                'llm_comment',
-                'validate_result']
             ]
+            if 'llm_comment' in df_jobs.columns:
+                columns.extend(['llm_comment', 'validate_result'])
+            df_jobs = df_jobs[columns]
             df_jobs = df_jobs.sort_values(by=['site', JobAttr.SEARCH_TITLE, JobAttr.COMPANY])
             df_jobs.to_csv(os.path.join('scrapped_jobs', f"{datetime.now().strftime('%Y-%m-%d_%H-%M')}.csv"), index=False)
